@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>message</title>
+    <script src="/js/jquery-2.1.4.js"></script>
+    <script src="js/chechLogin.js"></script>
+    <script src="js/userInfoBar.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/pager.js"></script>
+    <link rel="stylesheet" href="css/page.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="headerLeft">Message</div>
+        <div class="userInfoContainer">
+            <div class="userInfoItem userInfoBarUserName"></div>
+            <div class="userInfoItem userInfoBarUserType"></div>
+            <div class="userInfoItem">
+                <button class="logoutBtn">log out</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="mainLeft">
+            <div class="menuItem" value="user">Contacts</div>
+            <div class="menuItem" value="message">Message</div>
+            <div class="menuItem" value="main">Home</div>
+        </div>
+        <div class="mainRight">
+            <div id="listDiv">
+                <div class="toolButtonRow">
+                    <div>
+                        <button id="open">Send</button>
+                        <button id="refreshBtn">Refresh</button>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <div class="tableContainer">
+                        <table cellspacing="0">
+                            <thead>
+                            <tr>
+                                <td>Title</td>
+                                <td>Sender</td>
+                                <td>Time</td>
+                                <td>Operation</td>
+                            </tr>
+                            </thead>
+                            <tbody id="messagesContainer">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagerContainer">
+                        <div class="prePageBtn pagerBtn pagerItem">previous</div>
+                        <div class="pagerItem" style="display: flex;">
+                            <div class="curPageNum">1</div>
+                            <div>/</div>
+                            <div class="totalPageNum">1</div>
+                        </div>
+                        <div class="nextPageBtn pagerBtn pagerItem">next</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="popup" style="display:none;">
+                <div class="toolButtonRow">
+                    <button id="send">Send</button>
+                    <button id="close">Back</button>
+                </div>
+                <div>
+                    <div>
+
+                        <div class="formItem">
+                            <div class="formItemLabel">Send to</div>
+                            <div>
+                                <select id="receiverId">
+                                    <option value="">please choose</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="formItem">
+                            <div class="formItemLabel">Title</div>
+                            <div><input type="text" id="title" style="width: 300px"></div>
+                        </div>
+                        <div class="formItem">
+                            <div class="formItemLabel">Content</div>
+                            <div><textarea rows="5" id="content" style="width: 450px"></textarea></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="detailDialog" style="display:none;">
+                <div class="toolButtonRow">
+                    <button id="detail_close">Back</button>
+                </div>
+                <div>
+                    <div>
+
+                        <div class="formItem">
+                            <div class="formItemLabel">Sender</div>
+                            <div id="detail_senderUserName"></div>
+                        </div>
+                        <div class="formItem">
+                            <div class="formItemLabel">Time</div>
+                            <div id="detail_sendTime"></div>
+                        </div>
+                        <div class="formItem">
+                            <div class="formItemLabel">Title</div>
+                            <div id="detail_title"></div>
+                        </div>
+                        <div class="formItem">
+                            <div class="formItemLabel">Content</div>
+                            <div id="detail_content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<template id="messageRowTemplate" style="display: none;">
+    <tr>
+        <td>##title##</td>
+        <td>##senderUserName##</td>
+        <td>##sendTime##</td>
+        <td>
+<!--            <button onclick="openDetail(##id##)">详情</button>-->
+        </td>
+    </tr>
+</template>
+
+</body>
+
+<script>
+    function load() {
+        getPage(1);
+    }
+
+    function getPage(pageNum) {
+        let messagesContainer = $('#messagesContainer');
+        messagesContainer.html("");
+
+        const url = new URL('http://localhost:8080/message/getMessages');
+        url.searchParams.append('userId', sessionStorage.getItem('userId'));
+        url.searchParams.append('current', pageNum);
+        let pageSize = 10;
+        url.searchParams.append('size', pageSize);
+
+        // 发送GET请求
+        fetch(url.toString())
+            .then(response => response.json())
+            .then(rs => {
+                // 修改总页数
+                const total = rs.data.total;
+                let totalPage = Math.floor(total / pageSize);
+                if (total % pageSize > 0) {
+                    totalPage++;
+                }
+                onSearchSuc(totalPage);
+
+                const messages = rs.data.list;
+                let templateHtml = $("#messageRowTemplate").html();
+
+                for (let i = 0; i < messages.length; i++) {
+                    let message = messages[i];
+                    let rowHtml = templateHtml
+                        .replace('##title##', message.title)
+                        .replace('##senderUserName##', message.senderUserName)
+                        .replace('##sendTime##', message.sendTime)
+                        .replace('##id##', message.id);
+                    messagesContainer.append(rowHtml);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function refresh() {
+        load();
+    }
+
+    function loadOtherUsers() {
+        const url = new URL('http://localhost:8080/user/getOtherUsers');
+        url.searchParams.append('userId', sessionStorage.getItem('userId'));
+        url.searchParams.append('current', 1);
+        url.searchParams.append('size', 10000);
+
+        // 发送GET请求
+        fetch(url.toString())
+            .then(response => response.json())
+            .then(rs => {
+                const users = rs.data.list;
+                let usersContainer = $('#receiverId');
+                for (let i = 0; i < users.length; i++) {
+                    let user = users[i];
+                    usersContainer.append("<option value=\"" + user.id + "\">" + user.user_name + "</option>");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function send(callback) {
+        const url = new URL('http://localhost:8080/message/createMessage');
+        let message = {
+            senderId: sessionStorage.getItem('userId'),
+            receiverId: $("#receiverId").val(),
+            title: $("#title").val(),
+            content: $("#content").val()
+        };
+        // 发送GET请求
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(message)
+        })
+            .then(response => response.json())
+            .then(rs => {
+                callback();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function openDetail(messageId) {
+        const url = new URL('http://localhost:8080/message/getMessageById');
+        url.searchParams.append('id', messageId);
+
+        // 发送GET请求
+        fetch(url.toString())
+            .then(response => response.json())
+            .then(rs => {
+                const message = rs.data;
+                $("#detail_senderUserName").text(message.senderUserName);
+                $("#detail_sendTime").text(message.sendTime);
+                $("#detail_title").text(message.title);
+                $("#detail_content").text(message.content);
+
+                $('#listDiv').hide();
+                $('#detailDialog').show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    const curPageName = "message";
+    $(document).ready(function () {
+        chechLogin();
+        initUserInfoBar();
+        initPager(getPage);
+        load();
+        loadOtherUsers();
+
+        $('.menuItem[value="message"]').addClass("menuItemActive");
+
+        $('.menuItem').click(function () {
+            var items = $('.menuItem');
+            var that = $(this);
+            onMenuItemClick(items, that)
+        });
+
+        $('#refreshBtn').click(function () {
+            refresh();
+        });
+
+        $('#send').click(function () {
+            send(function () {
+                $('#listDiv').show();
+                $('#popup').hide();
+            });
+        });
+
+        $('#open').click(function () {
+            $('#listDiv').hide();
+            $('#popup').show();
+        });
+
+        $('#close').click(function () {
+            $('#listDiv').show();
+            $('#popup').hide();
+        });
+
+        $('#detail_close').click(function () {
+            $('#listDiv').show();
+            $('#detailDialog').hide();
+        });
+
+
+    });
+</script>
+</html>

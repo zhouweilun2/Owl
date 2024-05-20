@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <title>Spring Boot WebSocket Chat Application</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    #timer,
+    #energy {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+<noscript>
+
+</noscript>
+<div id="username-page">
+  <div class="username-page-container">
+    <h1 class="title">Type your nickname</h1>
+    <form id="usernameForm" name="usernameForm">
+      <div class="form-group">
+        <input type="text" id="name" placeholder="Username" autocomplete="off" class="form-control" />
+      </div>
+      <div class="form-group">
+        <button type="submit" class="accent username-submit">Start Chatting</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="hidden" id="chat-page" >
+  <div class="video-container">
+    <video id="local-video" autoplay></video>
+    <button id="start-button">Start Video Chat</button>
+
+    <div id="timer">Time: 0:00</div> <!-- 显示会议时长 -->
+    <div id="energy">Energy: 0</div> <!-- 显示绿色环保能量 -->
+  </div>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2>Spring WebSocket Chat Demo</h2>
+
+    </div>
+    <ul id="messageArea">
+    </ul>
+    <form id="messageForm" name="messageForm">
+      <div class="form-group">
+        <div class="input-group clearfix">
+          <input type="text" id="message" placeholder="Type a message..." autocomplete="off" class="form-control"/>
+          <button type="submit" class="primary">Send</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="/js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const startButton = document.getElementById('start-button');
+    const videoElement = document.getElementById('local-video');
+    let energy = 0; // 初始化能量为 0
+    let startTime = null; // 初始化会议开始时间
+    let energyUpdateTime = null; // 初始化上次更新能量的时间
+
+    // 更新会议时长和绿色能量的显示函数
+    function updateDisplay() {
+      const currentTime = new Date().getTime();
+      const elapsedSeconds = Math.floor((currentTime - startTime) / 1000); // 计算已经过的秒数
+      const minutes = Math.floor(elapsedSeconds / 60); // 计算分钟
+      const seconds = elapsedSeconds % 60; // 计算秒数
+      document.getElementById('timer').textContent = `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`; // 更新会议时长显示
+
+      const minutesSinceUpdate = (currentTime - energyUpdateTime) / (1000 * 60); // 计算距离上次更新能量的分钟数
+      energy += Math.floor(minutesSinceUpdate); // 每分钟增加一点绿色能量
+      document.getElementById('energy').textContent = `Energy: ${energy}`; // 更新能量显示
+
+      energyUpdateTime = currentTime; // 更新上次更新能量的时间
+    }
+
+    // 按钮点击事件处理函数
+    startButton.addEventListener('click', async () => {
+      try {
+        startTime = new Date().getTime(); // 记录会议开始时间
+
+        // 获取本地视频流
+        // 将视频流设置给视频元素并播放
+        videoElement.srcObject = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+        videoElement.play();
+
+        // 显示视频容器
+        videoElement.parentElement.style.display = 'block';
+
+        energyUpdateTime = startTime; // 初始化上次更新能量的时间为会议开始时间
+
+        // 启动计时器，每秒更新会议时长和绿色能量的显示
+        setInterval(updateDisplay, 1000); // 每秒执行一次更新函数
+      } catch (error) {
+        console.error('Error accessing local media:', error);
+        alert('Error accessing local media. Please check your camera and microphone permissions.');
+      }
+    });
+  });
+
+</script>
+
+</body>
+</html>

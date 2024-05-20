@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="http://at.alicdn.com/t/font_1309180_m0vigzfu7y.css">
+</head>
+
+<body>
+    <header>
+        <h2 class="logo">    </h2>
+        <nav class="navigation">
+            <a href="tree.html">Tree</a>
+            <a href="farm.html">Farm</a>
+            <a href="chooseMeeting.html">Meeting</a>
+            <a href="video_test.html">Video(test)</a>
+
+            <a href="user.html">Contacts</a>
+            <a href="message.html">Message</a>
+            <a href="notice.html">Notice</a>
+            <a href="ranking.html">Ranking</a>
+
+            <br>
+            <a href="logins.html" id="12">Login</a>
+            <a href="../../../../../register.html" id="13">Register</a>
+
+            <a class="search-btn" onclick="as()">
+                <i class="iconfont iconchazhao"></i>
+            </a>
+
+            <a href="#" id="usernameDisplay1" style="background: #f9f9f9">1111</a>
+            <a href="#" id="usernameDisplay" style="background: #f9f9f9">111</a>
+
+            <button type="button" id="14" onclick="remove()" class="button">Log out</button>
+        </nav>
+    </header>
+
+
+    <section class="parallax">
+        <img src="img/hill1.png" id="hill1">
+        <img src="img/hill2.png" id="hill2">
+        <img src="img/hill3.png" id="hill3">
+        <img src="img/hill4.png" id="hill4">
+        <img src="img/hill5.png" id="hill5">
+        <img src="img/tree.png" id="tree">
+        <h2 id="text">Energy-Saving Office Platform</h2>
+        <img src="img/leaf.png" id="leaf">
+        <img src="img/plant.png" id="plant">
+    </section>
+
+    <section class="sec">
+        <h2>Welcome to Local Government Energy-Saving Office Platform</h2>
+
+    </section>
+
+    <script src="/js/echarts.min.js"></script>
+    <div class="echartsBox">
+        <!-- ECharts-->
+        <div class="echarts" id="main"></div>
+        <div class="echarts" id="main2"></div>
+        <div class="echarts" id="main3"></div>
+    </div>
+
+    <script type="text/javascript">
+        var userList = [];
+        function fetchLeaderboard() {
+            fetch('/game/leaderboard')
+            .then(response => response.json())
+            .then(users => {
+                userList = users;
+                console.log(userList);
+                const userNameList = this.userList.map((item) => {
+                    return item.user_name;
+                })
+                const energyList = this.userList.map((item) => {
+                    return item.energy;
+                })
+
+                var mydata = [];
+                for (var i=0;i<userList.length;i++){
+                    mydata[i] = {value: userList[i].energy, name: userList[i].user_name};
+                }
+                console.log(mydata)
+
+                // 基于准备好的dom，初始化echarts实例
+                var myChart = echarts.init(document.getElementById('main'));
+                var myChart2 = echarts.init(document.getElementById('main2'));
+                var myChart3 = echarts.init(document.getElementById('main3'));
+
+                // 指定图表的配置项和数据
+                var option = {
+                    backgroundColor: 'white',
+                    title: {
+                        text: 'User energy value',
+                        left: "center",
+                    },
+                    tooltip: {},
+                    legend: {
+                        data: ['Energy value'],
+                        left: "right",
+                        bottom: "center"
+                    },
+                    xAxis: {
+                        data: userNameList
+                    },
+                    yAxis: {},
+                    series: [
+                        {
+                            name: 'Energy value',
+                            type: 'bar',
+                            data: energyList
+                        },
+                        {
+                            name: 'Energy value',
+                            type: 'line',
+                            data: energyList
+                        }
+                    ]
+                };
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+
+                var option2 = {
+                    backgroundColor: 'white',
+                    title: {
+                        text: 'User energy value',
+                        left: "center",
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    },
+                    legend: {
+                        data: ['Energy value'],
+                        left: "right",
+                        bottom: "center"
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'value',
+                        boundaryGap: [0, 0.01]
+                    },
+                    yAxis: {
+                        inverse: true,
+                        type: 'category',
+                        data: userNameList
+                    },
+                    series: [
+                        {
+                            name: 'Energy value',
+                            type: 'bar',
+                            data: energyList
+                        },
+                    ]
+                };
+                myChart2.setOption(option2);
+
+
+                var option3 = {
+                    backgroundColor: 'white',
+                    // color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
+                    title: {
+                        text: 'User energy value',
+                        left: "center",
+                    },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        data: ['Energy value'],
+                        left: "right",
+                        // bottom: "center"
+                    },
+                    series: [
+                        {
+                            name: 'Energy value',
+                            type: 'pie',
+                            radius: '50%',
+                            data: mydata,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart3.setOption(option3);
+
+            })
+            .catch(error => console.error('Error fetching leaderboard:', error));
+        }
+        // Load the leaderboard when the page loads
+        window.onload = fetchLeaderboard;
+
+    </script>
+
+    <script>
+        var cartItems =sessionStorage.getItem('username');
+        var  usertype =sessionStorage.getItem('user_type');
+        if (cartItems != null){
+            document.getElementById("12").style.visibility = "hidden";
+            document.getElementById("13").style.visibility = "hidden";
+            document.getElementById("14").style.visibility = "visible";
+            document.getElementById("usernameDisplay").style.visibility = "visible";
+            document.getElementById("usernameDisplay1").style.visibility = "visible";
+        }else {
+            document.getElementById("12").style.visibility = "visible";
+            document.getElementById("13").style.visibility = "visible";
+            document.getElementById("14").style.visibility = "hidden";
+            document.getElementById("usernameDisplay").style.visibility = "hidden";
+            document.getElementById("usernameDisplay1").style.visibility = "hidden";
+            window.location.href = 'logins.html'; // Redirect to login page
+
+        }
+
+        document.getElementById('usernameDisplay').textContent = cartItems;
+        document.getElementById('usernameDisplay1').textContent = usertype;
+        function remove(){
+            sessionStorage.removeItem('username')
+            sessionStorage.removeItem('user_type')
+            window.location.href = 'logins.html';
+
+        }
+
+
+    </script>
+    <script src="js/script.js">
+        // let arr = sessionStorage.getItem("username")
+        // console.log(JSON.parse(arr))
+        //  const name = sessionStorage.getItem('username');
+
+        // window.onload = function() {
+        //     const urlParams = new URLSearchParams(window.location.search);
+        //     const id = urlParams.get('id');
+        // fetch ('/getuser/?id=${id}').then(response => response.json())
+        //     .then(data => {
+        //         // 处理后端返回的数据
+        //         console.log(data);
+        //     })
+        //     .catch(error => {
+        //         // 处理请求错误
+        //         console.error('Error:', error);
+        //     });
+        // };
+    </script>
+</body>
+
+</html>

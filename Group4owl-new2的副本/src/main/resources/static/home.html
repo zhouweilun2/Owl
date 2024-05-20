@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            transition: margin-left .5s;
+
+        }
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            z-index: 2;
+        }
+        .menu-icon {
+            cursor: pointer;
+            font-size: 30px;
+            color: #f2f2f2;
+            padding: 14px;
+            user-select: none;
+        }
+        .topnav a {
+            flex-grow: 1;
+            text-align: center;
+            display: block;
+            color: #f2f2f2;
+            text-decoration: none;
+            padding: 14px 16px;
+        }
+        .sidenav {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+        .sidenav a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidenav a:hover {
+            color: #f1f1f1;
+        }
+
+        /* Styles for the modal popup */
+        .modal {
+            display: none; /* Hide the modal by default */
+            position: fixed;
+            z-index: 3; /* Sit on top of the sidebar */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scrolling if needed */
+            background-color: rgba(0,0,0,0.7); /* Black with opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* 10% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 700px;
+        }
+
+        /* Close button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer; /* Add cursor pointer */
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        /* Additional styles for leaderboard content */
+        .user-info {
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Center-align leaderboard title */
+        .leaderboard-title {
+            text-align: center;
+        }
+
+        /* Adjust modal content height to fit content */
+        .modal-content {
+            max-height: 80vh; /* Limiting height to 80% of viewport height */
+            overflow-y: auto; /* Add scrollbar if content exceeds the height */
+        }
+    </style>
+</head>
+<body>
+
+<div class="topnav">
+    <span class="menu-icon" onclick="toggleNav()">&#9776;</span>
+    <a href="#home">main page</a>
+    <a href="#contact">connect us</a>
+    <a href="#about">about</a>
+</div>
+
+<div id="mySidenav" class="sidenav">
+    <a href="#more" onclick="toggleLeaderboard()">Ranking</a>
+    <a href="#">link2</a>
+    <a href="#">link3</a>
+    <a href="#">link4</a>
+    <a href="#">link5</a>
+</div>
+
+<!-- Modal popup for the leaderboard -->
+<div id="leaderboardModal" class="modal" onclick="closeLeaderboard()"> <!-- Added onclick event -->
+    <div class="modal-content">
+        <span class="close" onclick="closeLeaderboard()">&times;</span>
+        <h2 class="leaderboard-title">Leaderboard</h2>
+        <div id="leaderboardContent"></div>
+    </div>
+</div>
+
+<script>
+    function toggleNav() {
+        var sidenav = document.getElementById("mySidenav");
+        if (sidenav.style.width === "250px") {
+            sidenav.style.width = "0";
+        } else {
+            sidenav.style.width = "250px";
+        }
+    }
+
+    // Function to toggle the leaderboard modal
+    function toggleLeaderboard() {
+        var modal = document.getElementById("leaderboardModal");
+        if (modal.style.display === "block") {
+            modal.style.display = "none";
+        } else {
+            modal.style.display = "block";
+            fetchLeaderboard(); // Fetch leaderboard when modal is shown
+        }
+    }
+
+    // Function to close the leaderboard modal
+    function closeLeaderboard() {
+        document.getElementById("leaderboardModal").style.display = "none";
+    }
+
+    // Function to fetch and load the leaderboard content
+    function fetchLeaderboard() {
+        fetch('/game/leaderboard')
+            .then(response => response.json())
+            .then(users => {
+                const leaderboardElement = document.getElementById('leaderboardContent');
+                leaderboardElement.innerHTML = ''; // Clear existing leaderboard entries
+                users.forEach(user => {
+                    const userElement = document.createElement('div');
+                    userElement.classList.add('user');
+                    userElement.innerHTML = `
+                        <div class="user-info">
+                            ${user.user_name} - Energy: ${user.energy}
+                        </div>
+                    `;
+                    leaderboardElement.appendChild(userElement);
+                });
+            })
+            .catch(error => console.error('Error fetching leaderboard:', error));
+    }
+</script>
+
+</body>
+</html>

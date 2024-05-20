@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contacts</title>
+    <script src="/js/jquery-2.1.4.js"></script>
+    <script src="js/chechLogin.js"></script>
+    <script src="js/userInfoBar.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/pager.js"></script>
+    <link rel="stylesheet" href="css/page.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="headerLeft">Message</div>
+        <div class="userInfoContainer">
+            <div class="userInfoItem userInfoBarUserName"></div>
+            <div class="userInfoItem userInfoBarUserType"></div>
+            <div class="userInfoItem">
+                <button class="logoutBtn">Log out</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="mainLeft">
+            <div class="menuItem" value="user">Contacts</div>
+            <div class="menuItem" value="message">Message</div>
+            <div class="menuItem" value="main">Home</div>
+        </div>
+        <div class="mainRight">
+            <div class="tableContainer">
+                <table cellspacing="0">
+                    <thead>
+                    <tr>
+                        <td>Name</td>
+                        <td>Username</td>
+                        <td>Type</td>
+                    </tr>
+                    </thead>
+                    <tbody id="usersContainer">
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagerContainer">
+                <div class="prePageBtn pagerBtn pagerItem">previous</div>
+                <div class="pagerItem" style="display: flex;">
+                    <div class="curPageNum">1</div>
+                    <div>/</div>
+                    <div class="totalPageNum">1</div>
+                </div>
+                <div class="nextPageBtn pagerBtn pagerItem">next</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<template id="userRowTemplate" style="display: none;">
+    <tr>
+        <td>##user_name##</td>
+        <td>##user_number##</td>
+        <td>##user_type##</td>
+    </tr>
+</template>
+
+</body>
+
+<script>
+    function load() {
+        getPage(1);
+    }
+
+    function getPage(pageNum){
+        let usersContainer = $('#usersContainer');
+        usersContainer.html("");
+
+        const url = new URL('http://localhost:8080/user/getOtherUsers');
+        url.searchParams.append('userId', sessionStorage.getItem('userId'));
+        url.searchParams.append('current', pageNum);
+        let pageSize = 10;
+        url.searchParams.append('size', pageSize);
+
+        // 发送GET请求
+        fetch(url.toString())
+            .then(response => response.json())
+            .then(rs => {
+                //修改总页数
+                const total = rs.data.total;
+                let totalPage = Math.floor(total/pageSize);
+                if (total%pageSize > 0){
+                    totalPage++;
+                }
+                onSearchSuc(totalPage);
+
+                const users = rs.data.list;
+                let templateHtml = $("#userRowTemplate").html();
+                for (let i = 0; i < users.length; i++) {
+                    let user = users[i];
+                    let rowHtml = templateHtml
+                        .replace('##user_name##', user.user_name)
+                        .replace('##user_number##', user.user_number)
+                        .replace('##user_type##', user.user_type);
+                    usersContainer.append(rowHtml);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    const curPageName = "user";
+    $(document).ready(function () {
+        chechLogin();
+        initUserInfoBar()
+        initPager(getPage);
+        load();
+
+        $('.menuItem[value="user"]').addClass("menuItemActive");
+
+        $('.menuItem').click(function () {
+            var items = $('.menuItem');
+            var that = $(this);
+            onMenuItemClick(items, that)
+        });
+    });
+</script>
+</html>

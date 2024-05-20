@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to log in</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            height: 100%;
+        }
+        body {
+            height: 100%;
+        }
+        .container {
+            height: 100%;
+            background-image: url("img/hill1.png") ;
+            background-size: cover;
+        }
+        .login-wrapper {
+            background-color: #FFFFFF;
+            width: 358px;
+            height: 588px;
+            border-radius: 15px;
+            padding: 0 50px;
+            position: relative;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+        }
+        .header {
+            font-size: 38px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 200px;
+        }
+        .input-item {
+            display: block;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 0;
+            padding: 10px;
+            border-bottom: 1px solid rgb(128,125,125);
+            font-size: 15px;
+            outline: none;
+        }
+        .input-item::placeholder {
+            text-transform: uppercase;
+        }
+        .btn {
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            margin-top: 40px;
+            background-image: linear-gradient(to right,#a6c1ee, #fbc2eb);
+            color: #fff;
+        }
+        .msg {
+            text-align: center;
+            line-height: 88px;
+        }
+        a {
+            text-decoration-line: none;
+            color: #abc1ee;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="login-wrapper">
+        <div class="header">Login</div>
+        <div class="form-wrapper">
+                username：<input type="text" id="name"  class="input-item"> <br>
+                password：<input type="password" id = "pwd"  class="input-item"> <br>
+                <BUTTON type="submit" onclick="login()"  class="btn">登录</BUTTON>
+        </div>
+        <div class="msg">
+            Don't have account?
+            <a href="register.html">Sign up</a>
+        </div>
+    </div>
+</div>
+<script>
+    function login(){
+        const name = document.getElementById("name").value;
+        const pwd = document.getElementById("pwd").value;
+        if(!name || !pwd){
+            alert("Please enter your account number and password");
+            return;
+        }
+        fetch ('/login',{
+            method:'POST',
+            headers:{
+                "Content-Type":"application/json;charset=utf-8"
+            },
+            body: JSON.stringify({user_number: name,passwords: pwd})
+        }).then(res => res.text()).then(res =>{
+            if (res){
+                let json = JSON.parse(res)
+                if(json.id){
+                    alert("Login Successful")
+                    sessionStorage.setItem('userId',json.id);
+                    sessionStorage.setItem('username',json.user_name);
+                    sessionStorage.setItem('user_type',json.user_type);
+                    window.location.href = "index.html"
+
+                }
+            }else {
+                alert("Login failed, incorrect account or password.")
+            }
+        })
+    }
+</script>
+</body>
+</html>

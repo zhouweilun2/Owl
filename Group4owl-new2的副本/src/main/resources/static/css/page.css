@@ -1,0 +1,127 @@
+body {
+    margin: 0px;
+    font-size: 13px;
+}
+
+.container{
+    height: 100vh;
+    width: 100%;
+    flex-direction: column;
+    display: flex;
+}
+
+.header {
+    height: 60px;
+    line-height: 60px;
+    color: white;
+    background-color: #006400;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 10px 0px 10px;
+}
+
+.headerLeft {
+    font-size: 25px;
+}
+
+.main{
+    display: flex;
+    flex-grow: 1; /* 这会使得该元素撑到底部 */
+    background-color: #e0e3ea;
+}
+
+.mainLeft{
+    width: 150px;
+    background-color: #006400;
+    margin: 10px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.menuItem{
+    height: 30px;
+    line-height: 30px;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.menuItem:hover {
+    background-color: #3CB371; /* 鼠标悬停时的背景色 */
+}
+
+.menuItemActive {
+    background-color: #3CB371; /* 鼠标选中（按下）时的背景色 */
+}
+
+.mainRight{
+    width: 100%;
+    background-color: white;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.toolButtonRow{
+    margin: 10px;
+}
+
+.tableContainer {
+    display: flex;
+    justify-content: center;
+}
+
+table {
+    background-color: white;
+    padding: 10px;
+    width: 100%;
+}
+
+thead tr td {
+    border-top: 1px solid #e0e3ea;
+}
+
+tr td {
+    border-bottom: 1px solid #e0e3ea;
+    height: 30px;
+}
+
+.formItem{
+    display: flex;
+    height: 30px;
+    line-height: 30px;
+    margin-top: 3px;
+}
+
+.formItemLabel{
+    width: 100px;
+    text-align: center;
+    background-color: #e0e3ea;
+    margin-right: 10px;
+}
+
+.userInfoContainer{
+    display: flex;
+}
+
+.userInfoItem{
+    margin-right: 10px;
+}
+
+.pagerContainer{
+    display: flex;
+}
+
+.pagerItem{
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.pagerBtn{
+    cursor: pointer;
+}
+
+.pagerBtn:hover{
+    text-decoration: underline;
+}

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebRTC Video Call</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.0.0/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<div>
+  <label for="username">Username:</label>
+  <input type="text" id="username">
+  <button onclick="joinConference()">Join Conference</button>
+</div>
+<div id="adminControls" style="display:none;">
+  <button onclick="startCall()">Start Call</button>
+  <button onclick="endCall()">End Call</button>
+</div>
+<video id="remoteVideo" autoplay style="width: 300px; height: 200px;"></video>
+<p>Participants</p>
+<ul id="participants"></ul>
+
+<div>
+  <h3>Chat</h3>
+  <div id="chatBox" style="border: 1px solid #ccc; height: 200px; overflow-y: scroll;"></div>
+  <input type="text" id="chatInput" placeholder="Type your message...">
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<button onclick="leaveConference()">Leave Conference</button>
+
+<div id="energyDisplay"></div> <!-- 显示能量值的地方 -->
+
+<script>
+  var stompClient = null;
+  var localStream = null;
+  var username = null;
+  var remoteVideo = document.getElementById('remoteVideo');
+  var participantsList = document.getElementById('participants');
+  var chatBox = document.getElementById('chatBox');
+  var energyDisplay = document.getElementById('energyDisplay'); // 能量值显示的地方
+  var reconnectInterval = 1000; // 重连间隔时间 (毫秒)
+  var isConnected = false; // 连接状态标志
+  var energy = 1; // 能量值
+  var lastMessageTime = null; // 上次发送消息的时间
+
+  function connect() {
+    var socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function(frame) {
+      console.log('Connected: ' + frame);
+      isConnected = true; // 连接成功，设置连接状态为true
+      stompClient.subscribe('/topic/video', function(message) {
+        handleRemoteVideoData(message.binaryBody);
+      });
+      stompClient.subscribe('/topic/users', function(message) {
+        updateParticipantsList(JSON.parse(message.body));
+      });
+      // 订阅聊天消息的主题
+      stompClient.subscribe('/topic/chat', function(message) {
+        displayMessage(JSON.parse(message.body));
+      });
+      stompClient.send("/app/join", {}, username);
+    }, function(error) {
+      console.error('STOMP error:', error);
+      isConnected = false; // 连接失败，设置连接状态为false
+      setTimeout(function() {
+        if (!isConnected) {
+          connect(); // 尝试重连
+        }
+      }, reconnectInterval);
+    });
+  }
+
+  function joinConference() {
+    username = document.getElementById('username').value;
+    if (username === 'admin') {
+      document.getElementById('adminControls').style.display = 'block';
+    }
+    connect();
+  }
+
+  function startCall() {
+    if (!stompClient || !stompClient.connected || username !== 'admin') {
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(function(stream) {
+              localStream = stream;
+              document.getElementById('remoteVideo').style.display = 'block';
+              document.getElementById('remoteVideo').srcObject = localStream;
+              sendVideoData();
+            }).catch(function(error) {
+      console.error('Error accessing media devices:', error);
+    });
+  }
+
+  function sendVideoData() {
+    var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
+    var videoElement = document.getElementById('remoteVideo');
+
+    canvas.width = 640;
+    canvas.height = 480;
+
+    function captureFrame() {
+      context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(function(blob) {
+        var reader = new FileReader();
+        reader.onloadend = function() {
+          if (stompClient && stompClient.connected) {
+            stompClient.send("/app/video", {}, reader.result);
+          }
+        };
+        reader.readAsArrayBuffer(blob);
+      });
+      requestAnimationFrame(captureFrame);
+    }
+
+    captureFrame();
+
+    console.log("send video successful");
+  }
+
+  function handleRemoteVideoData(data) {
+    console.log("handle video");
+    var blob = new Blob([data], { type: 'video/webm' });
+    remoteVideo.src = URL.createObjectURL(blob);
+    console.log("handle video successful");
+  }
+
+  function updateParticipantsList(users) {
+    participantsList.innerHTML = '';
+    users.forEach(function(user) {
+      var li = document.createElement('li');
+      li.textContent = user;
+      participantsList.appendChild(li);
+    });
+  }
+
+  function sendMessage() {
+    var messageInput = document.getElementById('chatInput');
+    var message = messageInput.value.trim();
+    if (message !== '') {
+      console.log('Sending message:', message);
+      var chatMessage = {
+        type: 'CHAT',
+        content: message,
+        sender: username
+      };
+
+      // 检查是否超过能量值上限
+      if (energy >= 20) {
+        console.log("You have reached the maximum energy limit for today.");
+        return;
+      }
+
+      // 检查是否超过每日发送消息限制
+      var currentTime = new Date();
+      if (lastMessageTime !== null) {
+        var timeDifference = currentTime.getTime() - lastMessageTime.getTime();
+        var oneDay = 24 * 60 * 60 * 1000; // 一天的毫秒数
+        if (timeDifference < oneDay) {
+          energy++; // 每次发送消息能量值加一
+        } else {
+          energy = 0; // 超过一天，重置能量值
+          lastMessageTime = currentTime; // 更新上次发送消息的时间
+        }
+      } else {
+        lastMessageTime = currentTime; // 如果是第一条消息，记录发送时间
+      }
+
+      // 更新能量值显示
+      energyDisplay.textContent = 'Your Green Energy: ' + energy;
+
+      stompClient.send("/app/chat", {}, JSON.stringify(chatMessage));
+      messageInput.value = '';
+    }
+  }
+
+  function displayMessage(chatMessage) {
+    console.log('Received message:', chatMessage);
+
+    var messageElement = document.createElement('div');
+    var messageContent = document.createElement('span');
+    var messageTime = document.createElement('span');
+
+    var time = new Date();
+    var hours = time.getHours();
+    var minutes = time.getMinutes();
+    var seconds = time.getSeconds();
+
+    // Ensure leading zero for single digit hours, minutes, and seconds
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    messageTime.textContent = hours + ":" + minutes + ":" + seconds;
+
+    // 根据消息类型显示不同的内容
+    if (chatMessage.type === 'JOIN' || chatMessage.type === 'LEAVE') {
+      messageContent.textContent = chatMessage.sender + ' ' + chatMessage.content + ' - ';
+    } else {
+      messageContent.textContent = chatMessage.sender + ': ' + chatMessage.content + ' - ';
+    }
+
+    messageElement.appendChild(messageContent);
+    messageElement.appendChild(messageTime);
+    chatBox.appendChild(messageElement);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function leaveConference() {
+    if (stompClient !== null) {
+      stompClient.send("/app/leave", {}, username);
+      stompClient.disconnect();
+    }
+    // 清空参与者列表
+    participantsList.innerHTML = '';
+    console.log('You left the conference');
+
+    // 如果当前用户是参与者，从用户列表中移除该用户并更新显示
+    if (username !== 'admin') {
+      var index = users.indexOf(username);
+      if (index !== -1) {
+        users.splice(index, 1);
+        updateParticipantsList(users);
+      }
+    }
+  }
+
+  function endCall() {
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+    }
+    if (stompClient !== null) {
+      stompClient.disconnect();
+    }
+    console.log('Call ended');
+  }
+
+  window.addEventListener('beforeunload', function() {
+    endCall();
+  });
+</script>
+</body>
+</html>

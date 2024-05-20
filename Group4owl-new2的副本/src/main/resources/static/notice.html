@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>my notice</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_1309180_m0vigzfu7y.css">
+    <link rel="stylesheet" href="/css/layui.css">
+    <script src="/js/layui.js"></script>
+    <script src="/js/jquery-2.1.4.js"></script>
+    <style>
+        .notice-container {
+            width: 1200px;
+            background-color: white;
+            margin: 20px auto;
+            font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+            border-radius: 5px;
+        }
+
+        .layui-nav {
+            height: calc(100vh - 50px);
+            background-color: white;
+            border-right: 1px solid #F0EFEF;
+            text-align: center;
+        }
+
+        .layui-nav .layui-nav-item a {
+            color: black;
+            height: 60px;
+            line-height: 60px;
+            border-bottom: 1px solid #F0EFEF;
+            cursor: pointer;
+        }
+
+        .layui-nav .layui-nav-item a:hover{
+            color: black;
+        }
+
+        .item-list {
+            height: calc(100vh - 115px);
+            overflow-y: auto;
+        }
+
+        .detail-item {
+            padding: 10px;
+            background-color: #CDEACF;
+        }
+
+        .detail-title {
+            margin: 5px 0 5px 0;
+        }
+
+        .detail-footer {
+            display: flex;
+            justify-content: space-between;
+            color: #5F5F5F;
+            margin-top: 5px;
+            padding: 5px;
+        }
+
+        .detail-all-click {
+            color: #01AAED;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-content {
+
+        }
+
+        .scroller::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .scroller::-webkit-scrollbar-track {
+            background-color: transparent;
+            -webkit-border-radius: 2em;
+            -moz-border-radius: 2em;
+            border-radius: 2em;
+        }
+
+        .scroller::-webkit-scrollbar-thumb {
+            background-color: rgb(147, 147, 153, 0.5);
+            -webkit-border-radius: 2em;
+            -moz-border-radius: 2em;
+            border-radius: 2em;
+        }
+
+
+        #noticeDialog {
+            width: 500px;
+            height: 400px;
+            background-color: #fff;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #D9D9D9;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body style="background-color: #B2DAB5">
+<div class="notice-container">
+    <div class="layui-row">
+        <div class="layui-col-xs3">
+            <ul class="layui-nav layui-nav-tree layui-inline" lay-filter="demo" style="margin-right: 10px;">
+                <li class="layui-nav-item"><a onclick="openNotice(this)">notice</a></li>
+                <li class="layui-nav-item"><a onclick="openSixin(this)">message</a></li>
+                <li class="layui-nav-item"><a href="#">Official information</a></li>
+            </ul>
+        </div>
+        <div class="layui-col-xs9">
+            <div class="detial-container">
+                <div class="detail-list" id="notice" >
+                    <div style="height: 60px;line-height: 60px;margin-left:10px;border-bottom: 1px solid #F0EFEF">
+                        <h2>all info</h2>
+                    </div>
+                    <div class="item-list scroller">
+                        <div class="detail-item">
+                            <div class="detail-title">
+                                <h3>Online customer service Qingming working time adjustment notice</h3>
+                            </div>
+                            <div class="detail-content">
+                                <p>Dear a<br/>
+                                    <br/>
+                                    Duty hours on 4 April (Ching Ming): 12:00 noon to 21:00 pm.
+                                    <br/>
+                                    <br/>
+                                    Normal working hours will resume from 5 April: 8:30 a.m. to 24:00 p.m.
+                                    <br/>
+                                    <br/>
+                                    We apologise for any inconvenience caused during this period!
+                                </p>
+                            </div>
+                            <div class="detail-all-click">
+                                <span onclick="openDialog(this)" style="cursor: pointer">View al</span>
+                                <span style="color: black">David</span>
+                            </div>
+                            <div class="detail-footer">
+                                <span>2024-04-01</span>
+                            </div>
+                            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 10px;"></fieldset>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div id="chat" style="display: none">
+                    <div style="height: 60px;line-height: 60px;margin-left:10px;border-bottom: 1px solid #F0EFEF">
+                        <h2>message</h2>
+                    </div>
+                    <div style="padding: 10px">
+                        <form class="layui-form" action="#">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 100px">Sender：</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="title" lay-verify="title" autocomplete="off"
+                                           placeholder="please enter the sender" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">Content：</label>
+                                <div class="layui-input-block">
+                                    <textarea class="layui-textarea" name="content" lay-verify="content"
+                                              rows="8"></textarea></div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button type="submit" class="layui-btn">Send</button>
+                                    <button type="reset" class="layui-btn layui-btn-primary">Reset</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="noticeDialog" style="display: none;padding: 10px">
+        <div style="text-align: center;">
+            <h3></h3>
+        </div>
+        <div style="padding: 10px">
+            <p id="content"></p>
+        </div>
+        <div style="width: 100%;margin-top: 65px;text-align: center">
+            <button  type="button" class="layui-btn" onclick="$('#noticeDialog').hide()">I KNOWN</button>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+
+    function openDialog(_this) {
+        let title =  $(_this).closest('div').prev().prev().html();
+        console.log(title)
+        let content =  $(_this).closest('div').prev().html();
+        $('#noticeDialog h3').html(title);
+        $('#noticeDialog #content').html(content);
+        $('#noticeDialog').show();
+    }
+
+    function openSixin(_this) {
+        $(_this).closest('li').css("background-color", "#87D8CA").css("color", "white");
+        $(_this).closest('li').siblings().css("background-color", "#ffffff").css("color", "black");
+        $('#chat').show();
+        $('#notice').hide();
+    }
+
+    function openNotice(_this) {
+        $(_this).closest('li').css("background-color", "#87D8CA").css("color", "white");
+        $(_this).closest('li').siblings().css("background-color", "#ffffff").css("color", "black");
+        $('#notice').show();
+        $('#chat').hide();
+    }
+</script>
+</html>

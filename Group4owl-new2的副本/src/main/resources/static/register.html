@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        html{
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background: url("img/hill1.png") no-repeat 0px 0px;
+            background-size: 100% 100%;
+            -moz-background-size: 100% 100%;
+        }
+        body{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+
+        }
+        input{
+            border:none; border-bottom:1px solid rgb(10, 10, 10);
+            width: 300px;
+        }
+        p{
+            text-align: center;
+            color: rgb(116, 113, 113);
+        }
+        .register {
+            margin-top: 50px;
+            width: 600px;
+            /*display: flex;*/
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 600px;
+            background-color: white;
+            box-shadow: 7px 7px 17px rgba(52, 56, 66, 0.5);
+            border-radius: 5%; /* 添加或修改此行 */
+        }
+
+        .d{
+            border-radius: 10%; /* 添加或修改此行 */
+            margin-top: 50px;
+            width: 300px;
+            /*display: flex;*/
+            justify-content: center;
+            align-items: center;
+            height: 600px;
+            background-color: mediumseagreen;
+            box-shadow: 7px 7px 17px rgba(52, 56, 66, 0.5);
+        }
+        .register_button {
+            border-color: cornsilk;
+            background-color: rgba(243, 202, 20, 0.7);
+            color: aliceblue;
+            border-style: hidden;
+            border-radius: 15px;
+            width: 190px;
+            height: 31px;
+            font-size: 16px;
+        }
+        .login_button{
+
+            border-radius: 50%;
+            text-decoration: none;
+            color: rgb(167, 150, 150);;
+            border-style: hidden;
+            width: 100px;
+            height: 31px;
+            font-size: 20px;
+        }
+        .title{
+            color: white;
+            text-align: center;
+        }
+    </style>
+    <style type="text/css">
+        input::-ms-input-placeholder{text-align: center;}
+        input::-webkit-input-placeholder{text-align: center;}
+    </style>
+</head>
+
+<body>
+<div class="register">
+    <h3>Register Now</h3>
+<!--    <form role="form" action = "register" method="post">-->
+    User Name: <p><input type="text" id="name" class="input-item" placeholder="Username length should not exceed 5 characters"></p>
+    Account: <p><input type="text" id="number" class="input-item" placeholder="Account length should be at least 6 characters"></p>
+    Password: <p><input type="password" id="passwords" class="input-item" placeholder="Password length should be at least 6 characters"> </p>
+    Repeat Password: <p><input type="password" id="passwords1" placeholder="Passwords should match" class="input-item"> </p>
+    <button type="submit" onclick="register()" class="register_button">Register</button><br><br>
+    <button type="submit" onclick="logins()" class="register_button">Login</button>
+
+    <!--    </form>-->
+</div>
+<div class="d">
+    <br><br>
+    <h3 class="title">Have an account？</h3>
+    <p style="color: white;">Login！</p>
+    <br><br><br><br><br><br><br><br><br><br><br><br>
+</div>
+<script>
+    function register(){
+        console.log("test")
+        const name = document.getElementById("name").value;
+        const number = document.getElementById("number").value;
+        const pwd1 = document.getElementById("passwords").value;
+        const pwd2 = document.getElementById("passwords1").value;
+        if (pwd1 !== pwd2){
+            alert("Two passwords don't match");
+            return;
+        }
+        if(!name || !pwd1|| !number){
+            alert("Please fill in the complete information");
+            return;
+        }
+        fetch ('/register',{
+
+            method:'POST',
+            headers:{
+                "Content-Type":"application/json;charset=utf-8"
+            },
+            body: JSON.stringify({user_name: name,passwords: pwd1,user_number: number})
+        }).then(res => res.text()).then(res =>{
+            if (res){
+                let json = JSON.parse(res)
+                if(json===true){
+                    alert("Successful registration")
+                    console.log("success")
+                    location.href = "index.html"
+                }
+            }else {
+                console.log("fail")
+
+                alert("registration failed")
+            }
+        })
+    }
+    var flag2=true;  //用户名判断标识符
+    var flag3=true;  //密码判断标识符
+
+
+    //判断用户名格式是否正确
+    username.onchange=function(){
+        var username=this.value;
+        var usernamePattern = /^\S{1,5}$/;  //用户名正则表达式
+        if(!usernamePattern.test(username) ){
+            alert("The username is not formatted correctly and cannot exceed five characters!")
+            flag2=false;
+        }
+        else{
+            flag2=true;
+        }
+
+    }
+
+    //判断密码格式是否正确
+    password1.onchange=function(){
+        var password1=this.value;
+        var passwordPattern = /^(?=.*[0-9])[0-9A-Za-z]{6,}$/;
+        if(!passwordPattern.test(password1)){
+            alert("The password is not in the right format and is at least 6 digits long");
+            flag3=false;
+        }
+        else{
+            flag3=true;
+        }
+
+    }
+
+    //注册函数
+    function register_click(){
+
+        var username=document.getElementById("username").value;
+        var password1=document.getElementById("password1").value;
+        var password2=document.getElementById("password2").value;
+
+        //localStory存储注册信息
+        localStorage.setItem("username",username);
+        localStorage.setItem("password",password1);
+
+
+        //判断是否注册成功
+        if ( flag2 && flag3 && password1!==''){
+            if(password1===password2){
+                alert("Registration was successful!");
+                window.location.href="login.html";
+            }
+            else{
+                alert("The password entered twice is not the same!");
+            }
+        }
+        else{
+            alert("The information is not in the correct format, please enter the correct information!")
+        }
+    }
+    //登录函数
+    function login_click(){
+        const formData = new FormData();
+        formData.append("username", localStorage.getItem("username"));
+        formData.append("password", localStorage.getItem("password"));
+        fetch("/register", {
+            method: "POST",
+            body: formData,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Registration successful:', data);
+                // 处理注册成功的响应，如显示提示信息、跳转页面等
+            })
+            .catch(error => {
+                console.error('Error during registration:', error);
+                // 处理注册失败的情况，如显示错误消息
+            });
+    }
+    function logins(){
+        window.location.href="logins.html";
+    }
+</script>
+
+</body>
+</html>

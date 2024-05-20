@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Farm</title>
+    <style>
+        .farm {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* 让农场垂直居中在视窗中 */
+            background-image: url('img/Farm_Background.jpg'); /* 添加 background-image 属性并设置背景图像的URL */
+            background-size: 100% 100%;
+        }
+
+        .plant1 {
+            position: absolute;
+            top: 28%;
+            left:33%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+
+        .plant2 {
+            position: absolute;
+            top: 34%;
+            left:23.5%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+
+        .plant3 {
+            position: absolute;
+            top: 40%;
+            left:14%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+
+        .plant4 {
+            position: absolute;
+            top: 34%;
+            left:42%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+        .plant5 {
+            position: absolute;
+            top: 42%;
+            left:33%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+
+        .plant6 {
+            position: absolute;
+            top: 48%;
+            left:23.5%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+
+        .plant7 {
+            position: absolute;
+            top: 41%;
+            left:52%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+        .plant8 {
+            position: absolute;
+            top: 47%;
+            left:42.5%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+        .plant9 {
+            position: absolute;
+            top: 54%;
+            left:33%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+        .plant10 {
+            position: absolute;
+            top: 46%;
+            left:16%;
+            width: 150px;
+            height: 150px;
+            margin: 5px;
+            overflow: hidden; /* 保证内容不溢出 */
+            cursor: pointer; /* 增加鼠标悬停时的手形图标 */
+            transition: transform 0.3s; /* 平滑变换效果 */
+        }
+
+        .plant:hover {
+            transform: scale(1.1); /* 鼠标悬停时放大 */
+        }
+
+        .vegetable-img {
+            position: absolute;
+            bottom: 0;    /* 定位到容器的底部 */
+            left: 0;      /* 定位到容器的左侧 */
+            width: 100%;  /* 宽度填满容器 */
+            height: auto; /* 高度自动调整 */
+
+        }
+    </style>
+</head>
+<body>
+<div id="home-content"></div>
+<div class="farm">
+    <div class="plant1">
+        <img src="img/plant3.png" alt="Vegetable" class="vegetable-img" onclick="steal(this)">
+    </div>
+
+    <div class="plant2">
+        <img src="img/plant3.png" alt="Vegetable" class="vegetable-img" onclick="steal(this)">
+    </div>
+
+    <div class="plant3">
+        <img src="img/plant3.png" alt="Vegetable" class="vegetable-img" onclick="steal(this)">
+    </div>
+
+    <div class="plant4">
+        <img src="img/plant2.png" alt="Vegetable" class="vegetable-img" onclick="steal(this)">
+    </div>
+
+    <div class="plant5">
+        <img src="img/plant2.png" alt="Vegetable" class="vegetable-img" onclick="steal(this)">
+    </div>
+
+    <div class="plant6">
+        <img src="img/plant2.png" alt="Vegetable" class="vegetable-img" onclick="steal(this)">
+    </div>
+
+    <div class="plant7">
+        <img src="img/plant1.png" alt="Vegetable" class="vegetable-img" onclick="steal(this)">
+    </div>
+
+    <div class="plant8">
+        <img src="img/plant1.png" alt="Vegetable" class="vegetable-img" onclick="steal(this)">
+    </div>
+
+    <div class="plant9">
+        <img src="img/plant1.png" alt="Vegetable" class="vegetable-img" onclick="steal(this)">
+    </div>
+
+</div>
+<script>
+    function includeHomeContent() {
+        // Fetch the content of home.html
+        fetch('home.html')
+            .then(response => response.text())
+            .then(html => {
+                // Find the element where you want to inject the home content
+                const contentElement = document.getElementById('home-content');
+                if (contentElement) {
+                    // Inject the HTML content into the specified element
+                    contentElement.innerHTML = html;
+                    // Execute the JavaScript code from home.html in the context of this page
+                    const scripts = contentElement.querySelectorAll('script');
+                    scripts.forEach(script => {
+                        const newScript = document.createElement('script');
+                        newScript.textContent = script.textContent;
+                        document.body.appendChild(newScript);
+                    });
+                }
+            })
+            .catch(error => console.error('Error including home content:', error));
+    }
+
+    // Call the function to include home content when the page loads
+    window.onload = includeHomeContent;
+
+    function steal(image) {
+        var username = sessionStorage.getItem('username'); // Get the username from sessionStorage
+        image.style.display = 'none';
+        if (!username) {
+            console.error('No username found in sessionStorage.');
+            alert('Please log in to steal energy.');
+            return; // Stop the function if no username is found
+        }
+
+        // Create the postData object with the username
+        const postData = {
+            username: username // Use the username from sessionStorage
+        };
+
+        fetch('/game/steal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Set the Content-Type as application/json
+            },
+            body: JSON.stringify(postData) // Stringify the postData object to send as JSON
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // If the server response is not ok, throw an error with the status text
+                    throw new Error('Failed to steal: ' + response.statusText);
+                }
+                return response.text(); // You can also use response.json() if the server responds with JSON
+            })
+            .then(data => {
+                // Stealing successful, update UI or provide feedback
+                console.log("Successfully stolen!");
+                alert("Energy increased by 10!");
+            })
+            .catch(error => {
+                // Handle errors, for example showing an error message to the user
+                console.error('Error stealing:', error);
+                alert('Failed to add energy: ' + error.message);
+            });
+    }
+</script>
+
+</body>
+</html>
